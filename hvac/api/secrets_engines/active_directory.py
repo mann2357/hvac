@@ -147,3 +147,17 @@ class ActiveDirectory(VaultApiBase):
         return self._adapter.delete(
             url=api_path,
         )
+
+    def list_libraries(self, mount_point=DEFAULT_MOUNT_POINT):
+        """This endpoint lists all existing libraries in the secrets engine.
+
+        Args:
+            mount_point (str, optional): Specifies the place where the secrets engine will be accessible (default: ad)
+
+        :return: The response of the request.
+        :rtype: requests.Response
+        """
+        api_path = utils.format_url("v1/{}/library", mount_point)
+        return self._adapter.list(
+            url=api_path
+        )
