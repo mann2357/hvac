@@ -203,11 +203,10 @@ class ActiveDirectory(VaultApiBase):
         """
         api_path = utils.format_url("/v1/{}/library/{}", mount_point, name)
         params = {
-            "name": name,
+            "service_account_names": service_account_names,
         }
         params.update(
             utils.remove_nones({
-                "service_account_names": service_account_names,
                 "ttl": ttl,
                 "max_ttl": max_ttl,
                 "disable_check_in_enforcement": disable_check_in_enforcement
@@ -231,4 +230,67 @@ class ActiveDirectory(VaultApiBase):
         api_path = utils.format_url("/v1/{}/library/{}", mount_point, name)
         return self._adapter.delete(
             url=api_path,
+        )
+
+    def get_library_status(self, name, mount_point=DEFAULT_MOUNT_POINT):
+        """This endpoint checks the status of service accounts in the given library
+        :param name: Specifies the name of the library to check
+        :type name: str | unicode
+        :param mount_point: Specifies the place where the secrets engine will be accessible (default: ad).
+        :type mount_point: str | unicode
+        :return: The response of the request.
+        :rtype: requests.Response
+        """
+        api_path = utils.format_url("/v1/{}/library/{}/status", mount_point, name)
+        return self._adapter.get(
+            url=api_path
+        )
+
+    def check_out_service_account(self, name, ttl=None, mount_point=DEFAULT_MOUNT_POINT):
+        """This endpoint checks out a service account from the given library
+        :param name: Specifies the name of the library to check out an account
+        :type name: str | unicode
+        :param ttl: Specifies the TTL for this library.
+            This is provided as a string duration with a time suffix like "30s" or "1h" or as seconds.
+            If not provided, the default Vault TTL is used.
+        :type ttl: str | unicode
+        :param mount_point: Specifies the place where the secrets engine will be accessible (default: ad).
+        :type mount_point: str | unicode
+        :return: The response of the request.
+        :rtype: requests.Response
+        """
+        api_path = utils.format_url("/v1/{}/library/{}/check-out", mount_point, name)
+        params = {}
+        params.update(
+            utils.remove_nones({
+                "ttl": ttl,
+            })
+        )
+        return self._adapter.post(
+            url=api_path,
+            json=params,
+        )
+
+    def check_in_service_account(self, name, service_account_names=None, mount_point=DEFAULT_MOUNT_POINT):
+        """This endpoint checks in a service account from the given library. Typically, this must be done by the same entity that checked out the account.
+        :param name: Specifies the name of the library to check out an account
+        :type name: str | unicode
+        :param service_account_names: List of service accounts to check in at the given library.
+            May be omitted if only one account is checked out.
+        :type ttl: list
+        :param mount_point: Specifies the place where the secrets engine will be accessible (default: ad).
+        :type mount_point: str | unicode
+        :return: The response of the request.
+        :rtype: requests.Response
+        """
+        api_path = utils.format_url("/v1/{}/library/{}/check-in", mount_point, name)
+        params = {}
+        params.update(
+            utils.remove_nones({
+                "service_account_names": service_account_names,
+            })
+        )
+        return self._adapter.post(
+            url=api_path,
+            json=params,
         )
