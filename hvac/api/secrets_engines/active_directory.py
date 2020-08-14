@@ -176,3 +176,44 @@ class ActiveDirectory(VaultApiBase):
         return self._adapter.get(
             url=api_path,
         )
+
+    def create_or_update_library(self, name, service_account_names=None, ttl=None, max_ttl=None, disable_check_in_enforcement=None, mount_point=DEFAULT_MOUNT_POINT):
+        """This endpoint creates or updates the AD library definition.
+
+        :param name: Specifies the name of a library against which to create this set.
+        :type name: str | unicode
+        :param service_account_names: List of names of pre-existing service account(s) in Active Directory that maps to this library.
+            This value is required on create and optional on update.
+        :type service_account_name: list
+        :param ttl: Specifies the TTL for this library.
+            This is provided as a string duration with a time suffix like "30s" or "1h" or as seconds.
+            If not provided, the default Vault TTL is used.
+        :type ttl: str | unicode
+        :param max_ttl: Specifies maximum amount of time a single check-out lasts before Vault automatically checks it back in.
+            This is provided as a string duration with a time suffix like "30s" or "1h" or as seconds.
+            If not provided, the default Vault TTL is used.
+        :type max_ttl: str | unicode
+        :param disable_check_in_enforcement: Disable enforcing that service accounts must be checked in by the entity or client token that checked them out.
+            If not provided, the default Vault value is used (false)
+        :type disable_check_in_enforcement: bool
+        :param mount_point: Specifies the place where the secrets engine will be accessible (default: ad).
+        :type mount_point: str | unicode
+        :return: The response of the request.
+        :rtype: requests.Response
+        """
+        api_path = utils.format_url("/v1/{}/roles/{}", mount_point, name)
+        params = {
+            "name": name,
+        }
+        params.update(
+            utils.remove_nones({
+                "service_account_names": service_account_names,
+                "ttl": ttl,
+                "max_ttl": max_ttl,
+                "disable_check_in_enforcement": disable_check_in_enforcement
+            })
+        )
+        return self._adapter.post(
+            url=api_path,
+            json=params,
+        )
