@@ -161,3 +161,18 @@ class ActiveDirectory(VaultApiBase):
         return self._adapter.list(
             url=api_path
         )
+
+    def read_library(self, name, mount_point=DEFAULT_MOUNT_POINT):
+        """This endpoint queries for information about an AD library with the given name.
+        If no role exists with that name, a 404 is returned.
+        :param name: Specifies the name of the library to query.
+        :type name: str | unicode
+        :param mount_point: Specifies the place where the secrets engine will be accessible (default: ad).
+        :type mount_point: str | unicode
+        :return: The response of the request.
+        :rtype: requests.Response
+        """
+        api_path = utils.format_url("/v1/{}/library/{}", mount_point, name)
+        return self._adapter.get(
+            url=api_path,
+        )
