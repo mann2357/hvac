@@ -201,7 +201,7 @@ class ActiveDirectory(VaultApiBase):
         :return: The response of the request.
         :rtype: requests.Response
         """
-        api_path = utils.format_url("/v1/{}/roles/{}", mount_point, name)
+        api_path = utils.format_url("/v1/{}/library/{}", mount_point, name)
         params = {
             "name": name,
         }
@@ -216,4 +216,19 @@ class ActiveDirectory(VaultApiBase):
         return self._adapter.post(
             url=api_path,
             json=params,
+        )
+
+    def delete_role(self, name, mount_point=DEFAULT_MOUNT_POINT):
+        """This endpoint deletes an ad library with the given name.
+        Even if the library does not exist, this endpoint will still return a successful response.
+        :param name: Specifies the name of the library to delete.
+        :type name: str | unicode
+        :param mount_point: Specifies the place where the secrets engine will be accessible (default: ad).
+        :type mount_point: str | unicode
+        :return: The response of the request.
+        :rtype: requests.Response
+        """
+        api_path = utils.format_url("/v1/{}/library/{}", mount_point, name)
+        return self._adapter.delete(
+            url=api_path,
         )
